@@ -1,4 +1,6 @@
-import { Client, Project, Payment } from "../types";
+import type { Client, Project, Payment } from "../models/types";
+
+
 
 // Clients
 export const clients: Client[] = [
@@ -10,7 +12,7 @@ export const clients: Client[] = [
   },
   {
     id: "c2",
-    name: "Amina Karekezi",
+    name: "daniella",
     country: "Rwanda",
   },
 ];
