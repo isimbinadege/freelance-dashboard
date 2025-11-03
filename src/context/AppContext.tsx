@@ -1,38 +1,46 @@
-import { createContext, type Dispatch } from "react";
+import { useContext } from "react";
+import type { Project, Client } from "../models/types";
+import { AppContext } from "../context/AppContext";
 
-// ----- 1. State Type -----
-export type AppState = {
-  count: number;
+type ProjectListProps = {
+  projects: Project[];
+  clients: Client[];
 };
 
-// ----- 2. Actions -----
-export type Action = { type: "INCREMENT" } | { type: "DECREMENT" };
+export default function ProjectList({ projects, clients }: ProjectListProps) {
+  const { dispatch } = useContext(AppContext); // Removed 'state' since you're not using it
 
-// ----- 3. Context Type -----
-export type AppContextType = {
-  state: AppState;
-  dispatch: Dispatch<Action>;
-};
+  const markPaid = (projectId: string) => {
+    dispatch({ type: "MARK_PROJECT_PAID", payload: { projectId } });
+  };
 
-// ----- 4. Initial State -----
-export const initialState: AppState = {
-  count: 0,
-};
-
-// ----- 5. Reducer -----
-export function reducer(state: AppState, action: Action): AppState {
-  switch (action.type) {
-    case "INCREMENT":
-      return { ...state, count: state.count + 1 };
-    case "DECREMENT":
-      return { ...state, count: state.count - 1 };
-    default:
-      return state;
-  }
+  return (
+    <div>
+      {projects.map((project) => {
+        const client = clients.find((c) => c.id === project.clientId);
+        return (
+          <div
+            key={project.id}
+            className="p-4 bg-card rounded-xl shadow mb-3 border-l-4 
+              border-primary"
+          >
+            <h3 className="text-lg font-semibold">{project.title}</h3>
+            <p>Client: {client?.name ?? "Client not found"}</p>
+            <p>Status: {project.status}</p>
+            <p className={`font-semibold ${project.paymentStatus === "paid" ? "text-success" : "text-danger"}`}>
+              Payment: {project.paymentStatus}
+            </p>
+            {project.paymentStatus === "unpaid" && (
+              <button
+                onClick={() => markPaid(project.id)}
+                className="mt-2 px-3 py-1 bg-primary text-white rounded hover:bg-secondary transition-colors"
+              >
+                Mark Paid
+              </button>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
-
-// ----- 6. Create Context -----
-export const AppContext = createContext<AppContextType>({
-  state: initialState,
-  dispatch: () => {},
-});
